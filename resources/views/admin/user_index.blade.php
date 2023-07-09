@@ -27,8 +27,14 @@
                     <td>{{ $user->email }}</td>
                     <td>{{ $user->staff_id }}</td>
                     <td>{{ $user->department }}</td>
-                    <td></td>
-                    <td><a class="btn btn-primary">Edit</a></td>
+                    <td>
+                        @if($user->role =='user')
+                            <span class="badge bg-primary">User</span>
+                        @else
+                            <span class="badge bg-danger">Admin</span>
+                        @endif
+                    </td>
+                    <td><a href="{{ route('app.admin.user.edit', $user->id) }}" type="button" class="btn btn-primary">Edit</a></td>
                 </tr>
                 @endforeach
             </table>

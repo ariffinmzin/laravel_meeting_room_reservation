@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 
 use App\Models\User;
 
@@ -32,7 +33,8 @@ class UserController extends Controller
     public function create()
     {
         //
-        return view('admin.user_form');
+        $user = new User;
+        return view('admin.user_form', compact('user'));
     }
 
     /**
@@ -47,11 +49,32 @@ class UserController extends Controller
         // dd($request);
         $this->validate($request,[
             'name' => 'required',
-            'staffid' => 'nullable|min:5',
-            'email' => 'required|email'
+            'staff_id' => 'nullable|min:5', // alpha|numeric
+            'email' => 'required|email|unique:users,email',
+            'department' => 'nullable',
+            'role' => 'required|in:user,admin',
+            'password' => 'required|min:8|confirmed',
         ]);
 
-        dd('success');
+        // dd('success');
+        // dd($request);
+
+        $user = new User;
+
+        $user->fill($request->except('password')); // set in User model
+        $user->role = $request['role'];
+        $user->password = Hash::make($request['password']);
+
+        
+        // $user->name = $request['name'];
+        // $user->email = $request['email'];
+        // $user->department = $request['department'];
+        // $user->role = $request['role'];
+        // $user->password = Hash::make($request['password']);
+
+        $user->save(); // save in database
+
+        return redirect()->route('app.admin.user.index');
     }
 
     /**
@@ -60,7 +83,7 @@ class UserController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show(User $user) // ($id)
     {
         //
     }
@@ -71,9 +94,13 @@ class UserController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
+    public function edit(User $user)    // ($id) 404 laravel will handle
     {
         //
+        // dd($id); 
+        // $user = User::find($id); // laravel will not handle 404
+        return view('admin.user_form', compact('user'));
+
     }
 
     /**
@@ -83,9 +110,10 @@ class UserController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, User $user)// $id)
     {
         //
+        // $user = User::find($id);
     }
 
     /**
